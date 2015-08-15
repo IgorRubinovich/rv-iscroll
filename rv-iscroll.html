@@ -88,6 +88,15 @@ Example:
 
 Polymer({
   is: 'rv-iscroll',
+  
+  next : function() {
+	if(this.myScroll.pages.length)
+		this.myScroll.next();
+  },
+  prev : function() {
+	if(this.myScroll.pages.length)
+		this.myScroll.prev();
+  },
 
   properties: {
 
@@ -125,23 +134,56 @@ Polymer({
        */
       scrollY: {
         type: Boolean,
-        value: true
+        // value: true // ir: depreciating - boolean values are true whenever set so it's not possible to override with something like scroll-y="false"
+      },
+
+      /**
+       * Whether the component is ready
+       * @type {Boolean}
+       */
+      scrollY: {
+        type: Boolean,
+        // value: true // ir: depreciating - boolean values are true whenever set so it's not possible to override with something like scroll-y="false"
       },
 
     },
 
   ready: function () {
+	if(!this.scrollX && !this.scrollY)
+		this.scrollX = true;
+  
     var options = {
       zoom : this.zoom,
       scrollY : this.scrollY,
       scrollX : this.scrollX,
       freeScroll : this.freeScroll,
-    };
+     };
+	
+	var optName, that = this; 
+	
+	[].filter.call(this.attributes, function(attr) { 
+		if(attr.name.match(/^iscroll-/))
+		{
+			optName = attr.name
+							.replace(/^iscroll-/, '')
+							.split('-')
+							.map(function(token, index) { return index > 0 ? token.charAt(0).toUpperCase() + token.slice(1) : token })
+							.join('');
 
+			console.log(attr);
+			window.attr = attr;
+			options[optName] = attr.name == attr.value ? true : attr.value;
+		}
+	});
+	
+	console.log(options);
+
+	
     // If we don't wrap in setTimeout, y-scrolling doesn't immediately work in Chrome for Android :S
     setTimeout(function () {
-      this.myScroll = new IScroll(this.$.wrapper, options);
-    }.bind(this));
+		this.myScroll = new IScroll(this.$.wrapper, options);
+		this.isReady = true;
+    }.bind(this), 0);
   }
 });
 
