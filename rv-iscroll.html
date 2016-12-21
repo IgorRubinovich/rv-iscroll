@@ -126,17 +126,7 @@ Polymer({
        */
       scrollY: {
         type: Boolean,
-<<<<<<< HEAD
-=======
-      },
-
-      /**
-       * Whether the component is ready
-       * @type {Boolean}
-       */
-      scrollY: {
-        type: Boolean,
->>>>>>> 07a2b93fd65a6e292c946e0b864724c5815e95fe
+        value: true
       },
 
       /**
@@ -180,12 +170,7 @@ Polymer({
     // If we don't wrap in setTimeout, y-scrolling doesn't immediately work in Chrome for Android :S
     setTimeout(function () {
         this.scroll = new IScroll(this.$.wrapper, options);
-<<<<<<< HEAD
-        this.set("isReady", true);
-=======
-        this.isReady = true;
->>>>>>> 07a2b93fd65a6e292c946e0b864724c5815e95fe
-    }.bind(this), 0);
+    }.bind(this));
   }
 });
 
