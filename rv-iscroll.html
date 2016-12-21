@@ -74,6 +74,7 @@ Example:
   </style>
 
   <template>
+	[[ isReady ]]
     <div id="wrapper">
         <div id="scroller">
           <content></content>
@@ -88,7 +89,7 @@ Example:
 
 Polymer({
   is: 'rv-iscroll',
-
+  
   properties: {
 
 
@@ -125,23 +126,51 @@ Polymer({
        */
       scrollY: {
         type: Boolean,
-        value: true
       },
 
+      /**
+       * Whether the component is ready
+       * @type {Boolean}
+       */
+      isReady: {
+        type: Boolean,
+        value: false,
+		notify : true
+      }
     },
 
   ready: function () {
+    if(!this.scrollX && !this.scrollY)
+        this.scrollY = true;
+  
     var options = {
       zoom : this.zoom,
       scrollY : this.scrollY,
       scrollX : this.scrollX,
       freeScroll : this.freeScroll,
-    };
+     };
+    
+    var optName, that = this; 
+    
+    [].filter.call(this.attributes, function(attr) { 
+        if(attr.name.match(/^iscroll-/))
+        {
+            optName = attr.name
+                            .replace(/^iscroll-/, '')
+                            .split('-')
+                            .map(function(token, index) { return index > 0 ? token.charAt(0).toUpperCase() + token.slice(1) : token })
+                            .join('');
 
+            window.attr = attr;
+            options[optName] = attr.name == attr.value ? true : attr.value;
+        }
+    });
+    
     // If we don't wrap in setTimeout, y-scrolling doesn't immediately work in Chrome for Android :S
     setTimeout(function () {
-      this.myScroll = new IScroll(this.$.wrapper, options);
-    }.bind(this));
+        this.scroll = new IScroll(this.$.wrapper, options);
+        this.set("isReady", true);
+    }.bind(this), 0);
   }
 });
 
