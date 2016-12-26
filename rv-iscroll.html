@@ -74,7 +74,6 @@ Example:
   </style>
 
   <template>
-	[[ isReady ]]
     <div id="wrapper">
         <div id="scroller">
           <content></content>
@@ -137,10 +136,39 @@ Polymer({
         type: Boolean,
         value: false,
 		notify : true
+      },
+	  
+      /**
+       * "Manual" mode. Doesn't automatically attempt to initialize the iScroll. Use .init() or .refresh() to initialize manually.
+       * @type {Boolean}
+       */
+      manual: {
+        type: Boolean,
+        value: false,
+		notify : true
       }
     },
+	
+  refresh: function() {
+    if(!this.iscroll)
+		this.init();
+	else
+		this.iscroll.refresh();
+  },
+  
+  init: function () {
+	
+    // If we don't wrap in setTimeout, y-scrolling doesn't immediately work in Chrome for Android :S
+    setTimeout(function () {
+        this.iscroll = new IScroll(this.$.wrapper, this.options);
+		this.set("isReady", true);
+	}.bind(this));
+  },
 
   ready: function () {
+	if(!this.manual)
+		this.init();
+		
     if(!this.scrollX && !this.scrollY)
         this.scrollY = true;
   
@@ -153,6 +181,7 @@ Polymer({
     
     var optName, that = this; 
     
+	// parse attributes with iscroll- prefix
     [].filter.call(this.attributes, function(attr) { 
         if(attr.name.match(/^iscroll-/))
         {
@@ -166,12 +195,8 @@ Polymer({
             options[optName] = attr.name == attr.value ? true : attr.value;
         }
     });
-    
-    // If we don't wrap in setTimeout, y-scrolling doesn't immediately work in Chrome for Android :S
-    setTimeout(function () {
-        this.iscroll = new IScroll(this.$.wrapper, options);
-		this.set("isReady", true);
-	}.bind(this));
+
+	this.options = options;
   }
 });
 
